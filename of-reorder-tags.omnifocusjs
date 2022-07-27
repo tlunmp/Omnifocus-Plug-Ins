@@ -16,24 +16,19 @@
 			selection.tasks.forEach((task) => {
 				
 				var tagList = task.tags
-				
 				var selectionLength = task.tags.length
-				
 				var selectionValueList = [...Array(selectionLength).keys()]
-				
 				var selectionNameList = selectionValueList.map(String)
 				
 				task.tags.forEach((tag, index) => {
-						var formOption = new Form.Field.Option(`option${index}`, tag.name, selectionValueList, selectionNameList, index, index.toString())
-						reorderForm.addField(formOption)
+					var formOption = new Form.Field.Option(`option${index}`, tag.name, selectionValueList, selectionNameList, index, index.toString())
+					reorderForm.addField(formOption)
 				})
 				
 				var reorderResult = reorderForm.show("Reorder Selected Task Tags", "Confirm")
-				
 				var results = []
 				
 				reorderResult.then((result) => {				
-					
 					selectionValueList.forEach((selection) => {	
 						results.push(result.values[`option${selection}`])
 					})
@@ -41,12 +36,8 @@
 					var isResultsHaveDuplicates = new Set(results).size !== results.length
 					
 					if (isResultsHaveDuplicates) {
-					
 						new Alert("Error!", "Invalid Input", "Please try again").show()
-
-					
 					} else {
-					
 						task.tags.forEach((tag, index) => {
 							var resultPosition = results[index]
 							tagList.splice(resultPosition, 1, tag)
