@@ -27,24 +27,24 @@
 				
 				var reorderResult = reorderForm.show("Reorder Selected Task Tags", "Confirm")
 				var results = []
-				
-				reorderResult.then((result) => {				
+
+				reorderForm.validate = function(formObject){
+					results = []
 					selectionValueList.forEach((selection) => {	
-						results.push(result.values[`option${selection}`])
+						results.push(formObject.values[`option${selection}`])
 					})
 					
 					var isResultsHaveDuplicates = new Set(results).size !== results.length
-					
-					if (isResultsHaveDuplicates) {
-						new Alert("Error!", "Invalid Input", "Please try again").show()
-					} else {
-						task.tags.forEach((tag, index) => {
-							var resultPosition = results[index]
-							tagList.splice(resultPosition, 1, tag)
-						})
-						task.clearTags();
-						task.addTags(tagList)
-					}				
+					return isResultsHaveDuplicates ? false : true
+				}
+				
+				reorderResult.then((result) => {
+					task.tags.forEach((tag, index) => {
+						var resultPosition = results[index]
+						tagList.splice(resultPosition, 1, tag)
+					})
+					task.clearTags();
+					task.addTags(tagList)
 				})
 			})
 	});
