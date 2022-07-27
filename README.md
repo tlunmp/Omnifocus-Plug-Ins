@@ -1,5 +1,7 @@
 # Omnifocus Plug-Ins
 List of Omnifocus automation plug-ins 
 
-## Re-order tags
-- One selected task to re-arrange the tags
+## Reorder tags
+- Select one task to arrange the tags based on the position
+ numbers
+- Position number begins from 0 to Selected Task Tags length
