@@ -1,0 +1,122 @@
+/*{
+	"type": "action",
+	"targets": ["omnifocus"],
+	"author": "Ted Anthony L. Uy",
+	"identifier": "com.omni-automation.of.insert-tags",
+	"version": "1.0",
+	"description": "Insert tags",
+	"label": "Insert Tags",
+	"shortLabel": "Insert Tags",
+	"paletteLabel": "Insert Tags",
+	"image": "arrow.up.right.and.arrow.down.left.rectangle.fill"
+}*/
+(() => {
+	const action = new PlugIn.Action(function (selection, sender) {
+		var selectionTasks = getAllTaskFrom(selection);
+
+		// combine all user selection task tags
+		var selectionTags = flatTagsFrom(selectionTasks);
+
+		// remove duplication if user selected multiple taska
+		let unifiedSelectionTags = removeDuplicate(selectionTags);
+
+		// creates insert count and insert tags use for the form 
+		var insertCount = getInsertTagsCount(unifiedSelectionTags);
+		
+		var insertTags = createInsertTags(unifiedSelectionTags, insertCount);	
+
+		showInsertTagForm(insertTags, selection);
+	});
+	
+	function createInsertTags(tags, insertCount) {
+		var insertTags = new Array;
+
+		for (let i = 0, j = 0; i < insertCount; i++) {
+			if (i % 2 == 0) {
+				insertTags.push("↘️ Insert Tag");
+			} else {
+				insertTags.push(tags[j].name);
+				j++;
+			}
+		}
+		
+		return insertTags;
+	}
+
+	function removeDuplicate(tags) {
+		return tags.filter((tag, index, array) => array.findIndex((indexTag) => indexTag.name == tag.name) == index);
+	}
+
+	function getInsertTagsCount(tags) {
+		return tags.length * 2 + 1;
+	}
+
+	function getAllTaskFrom(selection) {
+		return selection.tasks;
+	}
+
+	function flatTagsFrom(tasks) {
+		return tasks.map((task) => task.tags.map((tag) => tag)).flat();
+	}
+
+	function isTagsEmptyFrom(flatTags) {
+		return flatTags.every((flatTag) => !flatTag.length);
+	}
+	
+	function showInsertTagForm(tags, selection) {
+		var insertTagsForm = new Form();
+
+		var allTags = flattenedTags;
+		var allTagNames = allTags.map((x) => x.name);
+
+		tags.forEach((tag, index) => {
+			var formOption = new Form.Field.Option(
+				`option${index}`,
+				tag,
+				allTagNames,
+				allTagNames,
+				tag != "↘️ Insert Tag" ? tag : null,
+				tag != "↘️ Insert Tag" ? tag : null
+			);
+
+			insertTagsForm.addField(formOption);
+		});
+
+		var insertTagsResult = insertTagsForm.show("test", "Confirm");
+
+		var results = new Array();
+
+		insertTagsForm.validate = function (formObject) {
+			results = [];
+
+			tags.forEach((tag, index) => {
+				if (formObject.values[`option${index}`] != null) results.push(formObject.values[`option${index}`]);
+			});
+
+			return new Set(results).size == results.length;
+		};
+
+		insertTagsResult.then(function (result) {
+			var userFinalTags = [];
+			results.forEach((userInputTag, index) => {
+				var userTag = allTags.filter((tag) => tag.name == userInputTag);
+				userFinalTags.push(userTag);
+			});
+
+			selection.tasks.forEach((task) => {
+				task.clearTags();
+				task.addTags(userFinalTags.flat());
+			});
+		});
+	}
+
+	action.validate = function (selection, sender) {
+		// validation code
+		// selection options: tasks, projects, folders, tags
+		var tagsList = selection.tasks.map((task) => task.tags);
+		var isAllTagsSame = tagsList.every((tags) => JSON.stringify(tags) == JSON.stringify(tagsList[0]));
+		return selection.tasks.length > 0 && isAllTagsSame;
+	};
+
+	return action;
+})();
