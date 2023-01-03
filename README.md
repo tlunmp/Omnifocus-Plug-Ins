@@ -11,4 +11,4 @@ List of Omnifocus automation plug-ins
 - Select multiple task with the same tags
 - Insert tags before or after the previous tags
 
-![screenshots](insert-tag-screenshot.PNG)
+![screenshots](https://github.com/tlunmp/Omnifocus-Plug-Ins/blob/main/screenshots/insert-tag-screenshot.PNG)
