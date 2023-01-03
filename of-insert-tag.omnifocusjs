@@ -82,7 +82,7 @@
 			insertTagsForm.addField(formOption);
 		});
 
-		var insertTagsResult = insertTagsForm.show("test", "Confirm");
+		var insertTagsResult = insertTagsForm.show("Insert Tags", "Confirm");
 
 		var results = new Array();
 
